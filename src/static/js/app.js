@@ -47,10 +47,28 @@ function TodoListCard() {
         [items],
     );
 
+    const onDeleteAllItems = () => {
+        fetch('/items', {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                setItems([]);
+            } else {
+                console.error('Failed to delete all items');
+            }
+        })
+        .catch(error => {
+            console.error('Network error:', error);
+        });
+    };
+
     if (items === null) return 'Loading...';
 
     return (
         <React.Fragment>
+            <button onClick={onDeleteAllItems}>Delete List</button>
             <AddItemForm onNewItem={onNewItem} />
             {items.length === 0 && (
                 <p className="text-center">No TODO items yet! Add one above!</p>
@@ -109,17 +127,6 @@ function AddItemForm({ onNewItem }) {
                         {submitting ? 'Adding...' : 'Add Item'}
                     </Button>
                 </InputGroup.Append>
-                <InputGroup.Append>
-                    <Button
-                        type="submit"
-                        variant="success"
-                        //onClick={removeItem}
-                        //disabled={!newItem.length}
-                        className={submitting ? 'disabled' : ''}
-                    >
-                        {submitting ? 'Deleting...' : 'Delete List'}
-                    </Button>
-                </InputGroup.Append>
             </InputGroup>
         </Form>
     );
@@ -127,7 +134,7 @@ function AddItemForm({ onNewItem }) {
 
 function ItemDisplay({ item, onItemUpdate, onItemRemoval }) {
     const { Container, Row, Col, Button } = ReactBootstrap;
-
+    
     const toggleCompletion = () => {
         fetch(`/items/${item.id}`, {
             method: 'PUT',
@@ -145,6 +152,7 @@ function ItemDisplay({ item, onItemUpdate, onItemRemoval }) {
         fetch(`/items/${item.id}`, { method: 'DELETE' }).then(() =>
             onItemRemoval(item),
         );
+
     };
 
     return (
