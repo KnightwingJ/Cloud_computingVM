@@ -1,5 +1,5 @@
 body {
-    background-color: #f4f4f4;
+    background-color: #4c4848;
     margin-top: 50px;
     font-family: 'Lato';
 }
@@ -15,11 +15,15 @@ body {
 }
 
 .item:hover {
-    box-shadow: 0 0 1em #aaa;
+    box-shadow: 0 0 1em #de4d4d;
+	scale:1.2;
 }
 
 .item.completed {
     text-decoration: line-through;
+	box-shadow:0 0 1em rgb(107,80,242);
+	transform: translate(-50px);
+	scale:0.8;
 }
 
 .toggles {
