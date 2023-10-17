@@ -1,13 +1,18 @@
 function App() {
     const { Container, Row, Col } = ReactBootstrap;
     return (
-        <Container>
-            <Row>
-                <Col md={{ offset: 3, span: 6 }}>
-                    <TodoListCard />
-                </Col>
-            </Row>
-        </Container>
+        <div>
+            <div className="banner">
+                <h1>TO DO LIST</h1>
+            </div>
+            <Container>
+                <Row>
+                    <Col md={{ offset: 3, span: 6 }}>
+                        <TodoListCard />
+                    </Col>
+                </Row>
+            </Container>
+        </div>
     );
 }
 
@@ -63,15 +68,16 @@ function TodoListCard() {
             console.error('Network error:', error);
         });
     };
+    
 
     if (items === null) return 'Loading...';
 
     return (
-        <React.Fragment>
-            <button onClick={onDeleteAllItems}>Delete List</button>
+        <React.Fragment> 
             <AddItemForm onNewItem={onNewItem} />
+            <button class = "deleteAll" onClick={onDeleteAllItems}>Delete All Items</button>
             {items.length === 0 && (
-                <p className="text-center">No TODO items yet! Add one above!</p>
+                <p className="NoItems">No items yet! Add one above!</p>
             )}
             {items.map(item => (
                 <ItemDisplay
@@ -133,8 +139,10 @@ function AddItemForm({ onNewItem }) {
 }
 
 function ItemDisplay({ item, onItemUpdate, onItemRemoval }) {
-    const { Container, Row, Col, Button } = ReactBootstrap;
-    
+    const { Container, Row, Col, Button, Form } = ReactBootstrap;
+    const [editing, setEditing] = React.useState(false);
+    const [editedName, setEditedName] = React.useState(item.name);
+
     const toggleCompletion = () => {
         fetch(`/items/${item.id}`, {
             method: 'PUT',
@@ -152,7 +160,26 @@ function ItemDisplay({ item, onItemUpdate, onItemRemoval }) {
         fetch(`/items/${item.id}`, { method: 'DELETE' }).then(() =>
             onItemRemoval(item),
         );
+    };
 
+    const editItem = () => {
+        setEditing(true);
+    };
+
+    const saveEdit = () => {
+        fetch(`/items/${item.id}`, {
+            method: 'PUT',
+            body: JSON.stringify({
+                name: editedName,
+                completed: item.completed,
+            }),
+            headers: { 'Content-Type': 'application/json' },
+        })
+            .then(r => r.json())
+            .then(updatedItem => {
+                onItemUpdate(updatedItem);
+                setEditing(false);
+            });
     };
 
     return (
@@ -177,8 +204,25 @@ function ItemDisplay({ item, onItemUpdate, onItemRemoval }) {
                         />
                     </Button>
                 </Col>
-                <Col xs={10} className="name">
-                    {item.name}
+                <Col xs={10} className={`name ${editing ? 'editing' : ''}`}>
+                    {editing ? (
+                        <React.Fragment>
+                            <Form.Control
+                                type="text"
+                                value={editedName}
+                                onChange={e => setEditedName(e.target.value)}
+                            />
+                            <Button
+                                size="sm"
+                                variant="success"
+                                onClick={saveEdit}
+                            >
+                                Save
+                            </Button>
+                        </React.Fragment>
+                    ) : (
+                        item.name
+                    )}
                 </Col>
                 <Col xs={1} className="text-center remove">
                     <Button
@@ -188,6 +232,14 @@ function ItemDisplay({ item, onItemUpdate, onItemRemoval }) {
                         aria-label="Remove Item"
                     >
                         <i className="fa fa-trash text-danger" />
+                    </Button>
+                    <Button
+                        size="sm"
+                        variant="link"
+                        onClick={editItem}
+                        aria-label="Edit Item"
+                    >
+                        <i className="fa fa-edit" />
                     </Button>
                 </Col>
             </Row>
