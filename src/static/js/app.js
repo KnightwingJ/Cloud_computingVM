@@ -52,22 +52,6 @@ function TodoListCard() {
         [items],
     );
 
-    const onDeleteAllItems = () => {
-        fetch('/items', {
-            method: 'DELETE'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                setItems([]);
-            } else {
-                console.error('Failed to delete all items');
-            }
-        })
-        .catch(error => {
-            console.error('Network error:', error);
-        });
-    };
     
 
     if (items === null) return 'Loading...';
@@ -75,7 +59,6 @@ function TodoListCard() {
     return (
         <React.Fragment> 
             <AddItemForm onNewItem={onNewItem} />
-            <button class = "deleteAll" onClick={onDeleteAllItems}>Delete All Items</button>
             {items.length === 0 && (
                 <p className="NoItems">No items yet! Add one above!</p>
             )}

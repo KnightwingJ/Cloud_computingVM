@@ -102,14 +102,14 @@ async function removeItem(id) {
     });
 }
 
-async function deleteAllItems() {
+/*async function deleteAllItems() {
     return new Promise((acc, rej) => {
         db.run('DELETE FROM todo_items', err => {
             if (err) return rej(err);
             acc();
         });
     });
-}
+}*/
 
 module.exports = {
     init,
@@ -119,5 +119,5 @@ module.exports = {
     storeItem,
     updateItem,
     removeItem,
-    deleteAllItems,
+    //deleteAllItems,
 };
